@@ -19,7 +19,20 @@ namespace EOS
         /// インスタンス
         /// </summary>
         /// <value></value>
-        public static Platform Instance { get; private set; } = null;
+        public static Platform Instance
+        {
+            get
+            {
+                if (_Instance == null)
+                {
+                    var Obj = new GameObject("Platform");
+                    _Instance = Obj.AddComponent<Platform>();
+                }
+
+                return _Instance;
+            }
+        }
+        private static Platform _Instance = null;
 
         /// <summary>
         /// プラットフォームインタフェース
@@ -47,9 +60,8 @@ namespace EOS
 
         private IntPtr LibraryPointer;
 #endif
-        void Awake()
+        void Start()
         {
-            Instance = this;
             DontDestroyOnLoad(gameObject);
 
 #if UNITY_EDITOR
@@ -93,7 +105,7 @@ namespace EOS
             }
 
             LoggingInterface.SetLogLevel(LogCategory.AllCategories, LogLevel.VeryVerbose);
-            LoggingInterface.SetCallback((Msg) => Debug.Log(Msg));
+            LoggingInterface.SetCallback((Msg) => Debug.Log("[" + Msg.Category + "]:" + Msg.Message));
 
             OnInitializeSubject.OnNext(Unit.Default);
             OnInitializeSubject.OnCompleted();
